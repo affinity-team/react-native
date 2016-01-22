@@ -39,6 +39,23 @@
 RCT_NOT_IMPLEMENTED(- (instancetype)initWithFrame:(CGRect)frame)
 RCT_NOT_IMPLEMENTED(- (instancetype)initWithCoder:(NSCoder *)aDecoder)
 
+- (void)setSelectionRange:(NSDictionary *)selectionRange
+{
+  NSInteger eventLag = _nativeEventCount - _mostRecentEventCount;
+  if (eventLag == 0) {
+    NSInteger selectionStart = [RCTConvert NSInteger:selectionRange[@"start"]];
+    NSInteger selectionEnd = [RCTConvert NSInteger:selectionRange[@"end"]];
+    UITextPosition *start = [self positionFromPosition:[self beginningOfDocument]
+                                                offset:selectionStart];
+    UITextPosition *end = [self positionFromPosition:[self beginningOfDocument]
+                                              offset:selectionEnd];
+    UITextRange *selection = [self textRangeFromPosition:start toPosition:end];
+    self.selectedTextRange = selection;
+  } else if (eventLag > RCTTextUpdateLagWarningThreshold) {
+    RCTLogWarn(@"Native TextInput(%@) is %zd events ahead of JS - try to make your JS faster.", self.text, eventLag);
+  }
+}
+
 - (void)setText:(NSString *)text
 {
   NSInteger eventLag = _nativeEventCount - _mostRecentEventCount;
