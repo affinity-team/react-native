@@ -508,6 +508,10 @@ const TextInput = React.createClass({
     this.setNativeProps({text: ''});
   },
 
+  setSelectionRange: function(start, end) {
+    this.setNativeProps({selectionRange: {start, end}});
+  },
+
   render: function() {
     if (Platform.OS === 'ios') {
       return this._renderIOS();
